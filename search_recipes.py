@@ -1,37 +1,46 @@
 import string
+
+import numpy as np
 import pandas as pd
 
 
-def get_and_clean(filePath):
-    readFile = pd.read_csv(filePath)
+def get_and_clean():
+    readFile = pd.read_csv('resource/Food Ingredients and Recipe Dataset with Image Name Mapping.csv')
     readFile = pd.DataFrame(readFile)
-    data_sec = readFile[readFile['Idiom'] == 'ENGLISH']
-    data_sec = data_sec.drop_duplicates(subset=["SLink"])
-    for i, row in data_sec.iterrows():
-        data_sec.at[i, 'ALink'] = data_sec.at[i, 'ALink'].lstrip('/').rstrip('/')
-    return data_sec
+    search_for_recipe_by_name(readFile)
 
-def Artist(data_sec, artist_name):
-    articsName = data_sec
-    for i, row in articsName.iterrows():
-        articsName.at[i, 'ALink'] = articsName.at[i, 'ALink'].lower()
-        articsName.at[i, 'ALink'] = articsName.at[i, 'ALink'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
-        articsName.at[i, 'ALink'] = articsName.at[i, 'ALink'].translate(str.maketrans(string.whitespace, ' '*len(string.whitespace), ''))
+def search_for_recipe_by_name(data_sec):
+    recipeName = data_sec
+    # rank = 0
+    for i, row in recipeName.iterrows():
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].lower()
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans(string.whitespace, ' '*len(string.whitespace), ''))
 
-    clean_input = artist_name
+        # rank += 1
+        print("Title name:", recipeName.at[i, 'Title'])
+
+    print("-------------------------------------------")
+    print("input artist name: ")
+    recipe_name = input()
+    clean_input = recipe_name
     clean_input = clean_input.lower()
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
-    print("Song of: ", artist_name)
+    print(recipe_name)
+
     list = []
-    for j, row in articsName.iterrows():
-        if articsName.at[j, 'ALink'] == clean_input:
-            list.append([articsName.at[j, 'SName']])
-    list_df = pd.DataFrame(list, columns=['Song'])
-    list_df = list_df.sort_values('Song')
-    list_df.to_json('query/artist1.json', orient='records', indent=4)
-    print("done")
+    for j, row in recipeName.iterrows():
+        if recipeName.at[j, 'Title'] == clean_input:
+            list.append([recipeName.at[j, 'Instructions']])
+    list_df = pd.DataFrame(list, columns=['Instructions'])
+    list_df = list_df.sort_values('Instructions')
+
+    count = 0
+    for i, row in list_df.iterrows():
+        count += 1
+        print("Title name:", list_df.at[i, 'Instructions'])
 
 
 if __name__ == '__main__':
-    get_and_clean("filepath")
+    get_and_clean()
