@@ -11,23 +11,20 @@ def get_and_clean():
 
 def search_for_recipe_by_name(data_sec):
     recipeName = data_sec
-    # rank = 0
     for i, row in recipeName.iterrows():
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].lower()
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans(string.whitespace, ' '*len(string.whitespace), ''))
 
-        # rank += 1
-        print("Title name:", recipeName.at[i, 'Title'])
 
     print("-------------------------------------------")
-    print("input artist name: ")
+    print("input name: ")
     recipe_name = input()
     clean_input = recipe_name
     clean_input = clean_input.lower()
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
-    print(recipe_name)
+    # print(recipe_name)
 
     list = []
     for j, row in recipeName.iterrows():
@@ -39,7 +36,7 @@ def search_for_recipe_by_name(data_sec):
     count = 0
     for i, row in list_df.iterrows():
         count += 1
-        print("Title name:", list_df.at[i, 'Instructions'])
+        print("Recipes:", list_df.at[i, 'Instructions'])
 
 
 if __name__ == '__main__':
