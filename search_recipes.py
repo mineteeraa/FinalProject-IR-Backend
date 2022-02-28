@@ -16,35 +16,35 @@ def get_and_clean():
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
-    search_for_recipe_by_name_TFIDF(readFile)
+    search_for_recipe_by_ingredients_TFIDF(readFile)
 
-def search_for_recipe_by_name_TFIDF(data_sec):
-    recipeName = data_sec
-    for i, row in recipeName.iterrows():
-        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].lower()
-        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
-        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+def search_for_recipe_by_ingredients_TFIDF(data_sec):
+    ingredientsName = data_sec
+    for i, row in ingredientsName.iterrows():
+        ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].lower()
+        ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
+        ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
     print("-------------------------------------------")
-    print("input name: ")
-    recipe_name = input()
-    clean_input = recipe_name
+    print("input ingredients: ")
+    ingredients = input()
+    clean_input = ingredients
     clean_input = clean_input.lower()
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
     vectorizer = TfidfVectorizer(ngram_range=(1, 2))
-    X = vectorizer.fit_transform(recipeName['Title'])
+    X = vectorizer.fit_transform(ingredientsName['Cleaned_Ingredients'])
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
     count = 0
     query = []
-    for i in results.argsort()[-10:][::-1]:
-        title = recipeName.iloc[i, 1]
-        recipes = recipeName.iloc[i, 3]
+    for i in results.argsort()[-5:][::-1]:
+        ingredients = ingredientsName.iloc[i, 5]
+        recipes = ingredientsName.iloc[i, 3]
         count += 1
-        query.append([title, recipes])
-    querydf = pd.DataFrame(query, columns=["Title", "Recipes"])
+        query.append([ingredients, recipes])
+    querydf = pd.DataFrame(query, columns=["Ingredients","Recipes"])
     print(querydf)
 
 
