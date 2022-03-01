@@ -4,14 +4,11 @@ import numpy as np
 import pandas as pd
 
 from spellchecker import SpellChecker
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 spell = SpellChecker()
 
-
-# def get_and_clean():
-#     readFile = pd.read_csv('resource/Food Ingredients and Recipe Dataset with Image Name Mapping.csv')
-#     readFile = pd.DataFrame(readFile)
-#     search_for_recipe_by_name(readFile)
 
 def get_and_clean():
     readFile = pd.read_csv('resource/Food Ingredients and Recipe Dataset with Image Name Mapping.csv')
@@ -19,9 +16,10 @@ def get_and_clean():
     readFile = readFile.dropna()
     readFile = readFile.drop_duplicates()
     for i, row in readFile.iterrows():
-        readFile.at[i, 'Title'] = readFile.at[i, 'Title'].lower()
-        readFile.at[i, 'Title'] = readFile.at[i, 'Title'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
-        readFile.at[i, 'Title'] = readFile.at[i, 'Title'].translate(
+        readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].lower()
+        readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
+            str.maketrans('', '', string.punctuation + u'\xa0'))
+        readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
     search_for_recipe_by_name_TFIDF(readFile)
@@ -47,17 +45,19 @@ def search_for_recipe_by_name_TFIDF(data_sec):
     print({'Recipe name': clean_input, 'Spell correct': ' '.join(spell_correct)})
     # print(recipe_name)
 
-    list = []
-    for j, row in recipeName.iterrows():
-        if recipeName.at[j, 'Title'] == clean_input:
-            list.append([recipeName.at[j, 'Instructions']])
-    list_df = pd.DataFrame(list, columns=['Instructions'])
-    list_df = list_df.sort_values('Instructions')
-
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    X = vectorizer.fit_transform(recipeName['Title'])
+    query_vec = vectorizer.transform([clean_input])
+    results = cosine_similarity(X, query_vec).reshape((-1,))
     count = 0
-    for i, row in list_df.iterrows():
+    query = []
+    for i in results.argsort()[-10:][::-1]:
+        title = recipeName.iloc[i, 1]
+        recipes = recipeName.iloc[i, 3]
         count += 1
-        print("Recipes:", list_df.at[i, 'Instructions'])
+        query.append([title, recipes])
+    querydf = pd.DataFrame(query, columns=["Title", "Recipes"])
+    print(querydf)
 
 
 if __name__ == '__main__':
