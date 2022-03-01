@@ -1,10 +1,14 @@
+import re
 import string
-
 import numpy as np
 import pandas as pd
+
+from spellchecker import SpellChecker
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import re
+
+spell = SpellChecker()  # the default is English (language='en')
+
 
 def get_and_clean():
     readFile = pd.read_csv('resource/Food Ingredients and Recipe Dataset with Image Name Mapping.csv')
@@ -13,17 +17,22 @@ def get_and_clean():
     readFile = readFile.drop_duplicates()
     for i, row in readFile.iterrows():
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].lower()
-        readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
-        readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+        readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
+            str.maketrans('', '', string.punctuation + u'\xa0'))
+        readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
+            str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
     search_for_recipe_by_ingredients_TFIDF(readFile)
+
 
 def search_for_recipe_by_ingredients_TFIDF(data_sec):
     ingredientsName = data_sec
     for i, row in ingredientsName.iterrows():
         ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].lower()
-        ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(str.maketrans('', '', string.punctuation + u'\xa0'))
-        ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+        ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(
+            str.maketrans('', '', string.punctuation + u'\xa0'))
+        ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(
+            str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
     print("-------------------------------------------")
     print("input ingredients: ")
@@ -33,9 +42,16 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec):
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
+    # check correct spelling and suggest the possible spelling corrections
+    spell_correct = ""
+    for element in clean_input.split():
+        spell_correct = spell_correct + " " + spell.correction(element)
+    spell_candidate = spell.candidates(clean_input)
+    print({"Correction:": spell_correct, "Or you mean: ": spell_candidate})
+
     vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     X = vectorizer.fit_transform(ingredientsName['Cleaned_Ingredients'])
-    query_vec = vectorizer.transform([clean_input])
+    query_vec = vectorizer.transform([spell_correct])
     results = cosine_similarity(X, query_vec).reshape((-1,))
     count = 0
     query = []
@@ -44,9 +60,8 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec):
         recipes = ingredientsName.iloc[i, 3]
         count += 1
         query.append([ingredients, recipes])
-    querydf = pd.DataFrame(query, columns=["Ingredients","Recipes"])
+    querydf = pd.DataFrame(query, columns=["Ingredients", "Recipes"])
     print(querydf)
-
 
 
 if __name__ == '__main__':
