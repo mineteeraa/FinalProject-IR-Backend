@@ -1,13 +1,16 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from .models import User, Favourite
 from . import db
+
 auth = Blueprint('auth', __name__)
+
 
 @auth.route('/login')
 def login():
     return render_template('login.html')
+
 
 @auth.route('/login', methods=['POST'])
 def login_post():
@@ -25,9 +28,11 @@ def login_post():
 
     return redirect(url_for('main.profile'))
 
+
 @auth.route('/signup')
 def signup():
     return render_template('signup.html')
+
 
 @auth.route('/signup', methods=['POST'])
 def signup_post():
@@ -48,7 +53,8 @@ def signup_post():
 
     return redirect(url_for('auth.login'))
 
-@auth.route('/add-favourite', methods=['POST' , 'GET'])
+
+@auth.route('/add-favourite', methods=['POST', 'GET'])
 def add_favourite():
     food_name = request.form.get('food_name')
     food_image = request.form.get('food_image')
@@ -60,6 +66,15 @@ def add_favourite():
     db.session.commit()
 
     return redirect(url_for('main.favourite'))
+
+
+@auth.route('/delete-favourite/<id>')
+def delete_favourite(id):
+    delete_favourite = Favourite.query.get(id)
+    db.session.delete(delete_favourite)
+    db.session.commit()
+    return redirect(url_for('main.favourite'))
+
 
 @auth.route('/logout')
 @login_required

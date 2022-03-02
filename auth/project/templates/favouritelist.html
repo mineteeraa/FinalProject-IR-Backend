@@ -1,13 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Favourite Lists</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block content %}
+<p class="title">
 {% for item in data %}
+    ID: {{item.id}}<br>
     Food Name: {{item.title}}<br>
-  ---------------------------------------------------------------------------------------------------
-  {% endfor %}
-</body>
-</html>
+    <img src="../static/FoodImages/FoodImages/{{item.image}}"><br>
+    <form action="/delete-favourite/{{item.id}}">
+      <input type="submit" value="Delete favourite">
+    </form><br>
+  ---------------------------------------------------------------------------------------------------<br>
+{% endfor %}
+</p>
+{% endblock %}

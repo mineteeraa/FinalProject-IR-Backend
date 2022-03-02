@@ -33,3 +33,4 @@ def ingredients():
 def favourite():
     favourite = Favourite.query.filter(Favourite.userid == current_user.id).all()
     return render_template('favouritelist.html', data=favourite, userid=current_user.id)
+
