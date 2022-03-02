@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 <p class="title">
+        {% with messages = get_flashed_messages() %}
+        {% if messages[0] == 1 %}
+            <div class="notification is-success">
+                 Add favourite success
+            </div>
+        {% endif %}
+         {% if messages[0] == 0 %}
+            <div class="notification is-danger">
+                 This food address already exists
+            </div>
+        {% endif %}
+        {% endwith %}
 {% for item in data %}
     ID: {{item.id}}<br>
     Food Name: {{item.title}}<br>

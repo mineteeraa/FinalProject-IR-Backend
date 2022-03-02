@@ -60,12 +60,16 @@ def add_favourite():
     food_image = request.form.get('food_image')
     user = request.form.get('user')
 
-    new_favourite = Favourite(title=food_name, image=food_image, userid=user)
+    favourite = Favourite.query.filter_by(title=food_name, userid=user).first()
+    if favourite:
+        flash(0)
+        return redirect(url_for('main.favourite'))
 
+    new_favourite = Favourite(title=food_name, image=food_image, userid=user)
     db.session.add(new_favourite)
     db.session.commit()
-
-    return redirect(url_for('main.favourite'))
+    flash(1)
+    return render_template('search_ingredients_list.html')
 
 
 @auth.route('/delete-favourite/<id>')
