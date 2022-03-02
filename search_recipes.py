@@ -1,6 +1,4 @@
-import re
 import string
-import numpy as np
 import pandas as pd
 
 from spellchecker import SpellChecker
@@ -18,7 +16,7 @@ def get_and_clean():
     for i, row in readFile.iterrows():
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].lower()
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
-            str.maketrans('', '', string.punctuation + u'\xa0'))
+            str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
@@ -30,7 +28,7 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec):
     for i, row in ingredientsName.iterrows():
         ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].lower()
         ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(
-            str.maketrans('', '', string.punctuation + u'\xa0'))
+            str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
         ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
@@ -39,15 +37,26 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec):
     ingredients = input()
     clean_input = ingredients
     clean_input = clean_input.lower()
-    clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
+    clean_input = clean_input.translate(str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
     # check correct spelling and suggest the possible spelling corrections
     spell_correct = ""
     for element in clean_input.split():
-        spell_correct = spell_correct + " " + spell.correction(element)
-    spell_candidate = spell.candidates(clean_input)
-    print({"Correction:": spell_correct, "Or you mean: ": spell_candidate})
+        if element == spell.correction(element):
+            if spell_correct == "":
+                spell_correct += element
+            else:
+                spell_correct = spell_correct + " " + element
+        else:
+            if spell_correct == "":
+                spell_correct = spell_correct + spell.correction(element)
+            else:
+                spell_correct = spell_correct + " " + spell.correction(element)
+    if clean_input != spell_correct:
+        print("Showing results for", spell_correct)
+    # spell_candidate = spell.candidates(spell_correct)
+    # print("Related Search: ", spell_candidate)
 
     vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     X = vectorizer.fit_transform(ingredientsName['Cleaned_Ingredients'])
