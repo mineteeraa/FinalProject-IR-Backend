@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
-from .models import User
+from .models import User, Favourite
 from . import db
-
 auth = Blueprint('auth', __name__)
 
 @auth.route('/login')
@@ -48,6 +47,19 @@ def signup_post():
     db.session.commit()
 
     return redirect(url_for('auth.login'))
+
+@auth.route('/add-favourite', methods=['POST' , 'GET'])
+def add_favourite():
+    food_name = request.form.get('food_name')
+    food_image = request.form.get('food_image')
+    user = request.form.get('user')
+
+    new_favourite = Favourite(title=food_name, image=food_image, userid=user)
+
+    db.session.add(new_favourite)
+    db.session.commit()
+
+    return redirect(url_for('main.favourite'))
 
 @auth.route('/logout')
 @login_required

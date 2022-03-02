@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p class="title">
+  {% for item in data %}
+    Food Name: {{item.Food_name}}<br>
+<!--  {{item.Images}}-->
+    <img src="../static/FoodImages/FoodImages/{{item.Images}}">
+
+    <form method="POST" action="/add-favourite">
+      <input name="food_name" value="{{item.Food_name}}" >
+      <input name="user" value="{{user_id}}">
+      <input name="food_image" value="{{item.Images}}" >
+      <input type="submit" value="Submit">
+    </form>
+  ---------------------------------------------------------------------------------------------------
+  {% endfor %}
+</p>
+{% endblock %}
