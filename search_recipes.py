@@ -1,6 +1,4 @@
-import re
 import string
-import numpy as np
 import pandas as pd
 
 from spellchecker import SpellChecker
@@ -18,7 +16,7 @@ def get_and_clean():
     for i, row in readFile.iterrows():
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].lower()
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
-            str.maketrans('', '', string.punctuation + u'\xa0'))
+            str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
@@ -30,7 +28,7 @@ def search_for_recipe_by_name_TFIDF(data_sec):
     for i, row in recipeName.iterrows():
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].lower()
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
-            str.maketrans('', '', string.punctuation + u'\xa0'))
+            str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
@@ -39,11 +37,8 @@ def search_for_recipe_by_name_TFIDF(data_sec):
     recipe_name = input()
     clean_input = recipe_name
     clean_input = clean_input.lower()
-    clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
+    clean_input = clean_input.translate(str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
-    spell_correct = spell.correction(clean_input)
-    print({'Recipe name': clean_input, 'Spell correct': ' '.join(spell_correct)})
-    # print(recipe_name)
 
     vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     X = vectorizer.fit_transform(recipeName['Title'])
@@ -58,6 +53,28 @@ def search_for_recipe_by_name_TFIDF(data_sec):
         query.append([title, recipes])
     querydf = pd.DataFrame(query, columns=["Title", "Recipes"])
     print(querydf)
+
+
+# check correct spelling and suggest the possible spelling corrections
+def recommendedWord(word):
+    spell_correct = ""
+    for w in word.split():
+        if w == spell.correction(w):
+            if spell_correct == "":
+                spell_correct += w
+            else:
+                spell_correct = spell_correct + " " + w
+
+        else:
+            if spell_correct == "":
+                spell_correct = spell_correct + spell.correction(w)
+            else:
+                spell_correct = spell_correct + " " + spell.correction(w)
+
+    if word != spell_correct:
+        return spell_correct
+    else:
+        return word
 
 
 if __name__ == '__main__':
