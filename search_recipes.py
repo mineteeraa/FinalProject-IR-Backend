@@ -5,7 +5,9 @@ from spellchecker import SpellChecker
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+
 spell = SpellChecker()  # the default is English (language='en')
+
 
 
 def get_and_clean():
@@ -22,6 +24,15 @@ def get_and_clean():
 
     search_for_recipe_by_ingredients_TFIDF(readFile)
 
+
+
+def search_for_recipe_by_name_TFIDF(data_sec):
+    recipeName = data_sec
+    for i, row in recipeName.iterrows():
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].lower()
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
+            str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
 
 def search_for_recipe_by_ingredients_TFIDF(data_sec):
     ingredientsName = data_sec
@@ -40,27 +51,9 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec):
     clean_input = clean_input.translate(str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
-    # check correct spelling and suggest the possible spelling corrections
-    spell_correct = ""
-    for element in clean_input.split():
-        if element == spell.correction(element):
-            if spell_correct == "":
-                spell_correct += element
-            else:
-                spell_correct = spell_correct + " " + element
-        else:
-            if spell_correct == "":
-                spell_correct = spell_correct + spell.correction(element)
-            else:
-                spell_correct = spell_correct + " " + spell.correction(element)
-    if clean_input != spell_correct:
-        print("Showing results for", spell_correct)
-    # spell_candidate = spell.candidates(spell_correct)
-    # print("Related Search: ", spell_candidate)
-
     vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     X = vectorizer.fit_transform(ingredientsName['Cleaned_Ingredients'])
-    query_vec = vectorizer.transform([spell_correct])
+    query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
     count = 0
     query = []
@@ -71,6 +64,29 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec):
         query.append([ingredients, recipes])
     querydf = pd.DataFrame(query, columns=["Ingredients", "Recipes"])
     print(querydf)
+
+
+
+# check correct spelling and suggest the possible spelling corrections
+def recommendedWord(word):
+    spell_correct = ""
+    for w in word.split():
+        if w == spell.correction(w):
+            if spell_correct == "":
+                spell_correct += w
+            else:
+                spell_correct = spell_correct + " " + w
+
+        else:
+            if spell_correct == "":
+                spell_correct = spell_correct + spell.correction(w)
+            else:
+                spell_correct = spell_correct + " " + spell.correction(w)
+
+    if word != spell_correct:
+        return spell_correct
+    else:
+        return word
 
 
 if __name__ == '__main__':
