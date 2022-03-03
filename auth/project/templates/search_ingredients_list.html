@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p class="title">
+  {% for item in data %}
+    Food Name: {{item.Food_name}}<br>
+    <img src="../static/FoodImages/FoodImages/{{item.Images}}"><br>
+
+    <form method="POST" action="/add-favourite">
+      <input name="food_name" value="{{item.Food_name}}" hidden>
+      <input name="user" value="{{user_id}}" hidden>
+      <input name="food_image" value="{{item.Images}}" hidden>
+      <input type="submit" value="Add to favourite">
+    </form><br>
+  ---------------------------------------------------------------------------------------------------<br>
+  {% endfor %}
+</p>
+{% endblock %}

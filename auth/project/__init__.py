@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-
+from .search_recipes import get_and_clean
+data_sec = get_and_clean()
 db = SQLAlchemy()
 
 def create_app():
@@ -31,5 +32,6 @@ def create_app():
     @app.before_first_request
     def create_tables():
         db.create_all()
+        db.session.commit()
 
     return app
