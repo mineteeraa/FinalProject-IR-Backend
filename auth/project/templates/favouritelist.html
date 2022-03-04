@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
+<form method="POST" action="/searchFavourite">
+    <label>Search recipe in favourite:</label>
+    <input type="text" id="searchFavourite" name="searchFavourite"><br>
+    <button type="submit">Submit</button>
+</form>
+<!--{% if suggestword != "" %}-->
+<!--<form method="POST" action="/searchFavourite">-->
+<!--    <label>Searching result from</label>-->
+<!--    <input type="text" id="suggestword" name="searchFavourite" value="{{suggestword}}"><br>-->
+<!--    <button type="submit">{{suggestword}}</button>-->
+<!--</form>-->
+<!--{% endif %}-->
 <p class="title">
         {% with messages = get_flashed_messages() %}
         {% if messages[0] == 1 %}
