@@ -2,37 +2,40 @@
 {% block content %}
 <form method="POST" action="/searchFavourite">
     <label>Search recipe in favourite:</label>
-    <input type="text" id="searchFavourite" name="searchFavourite"><br>
+    <input type="text" name="searchFavourite" value="{{searchFavourite}}" placeholder="Seach your favourite recipe here...."/>
+    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
     <button type="submit">Submit</button>
 </form>
-<!--{% if suggestword != "" %}-->
-<!--<form method="POST" action="/searchFavourite">-->
-<!--    <label>Searching result from</label>-->
-<!--    <input type="text" id="suggestword" name="searchFavourite" value="{{suggestword}}"><br>-->
-<!--    <button type="submit">{{suggestword}}</button>-->
-<!--</form>-->
-<!--{% endif %}-->
+
+{% if recommendWord != "" %}
+<form method="POST" action="/searchFavourite">
+    <label>Searching result from</label>
+    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <button type="submit">{{recommendWord}}</button>
+</form>
+{% endif %}
+
 <p class="title">
-        {% with messages = get_flashed_messages() %}
-        {% if messages[0] == 1 %}
-            <div class="notification is-success">
-                 Add favourite success
-            </div>
-        {% endif %}
-         {% if messages[0] == 0 %}
-            <div class="notification is-danger">
-                 This food address already exists
-            </div>
-        {% endif %}
-        {% endwith %}
+    {% with messages = get_flashed_messages() %}
+    {% if messages[0] == 1 %}
+<div class="notification is-success">
+    Add favourite success
+</div>
+{% endif %}
+{% if messages[0] == 0 %}
+<div class="notification is-danger">
+    This food address already exists
+</div>
+{% endif %}
+{% endwith %}
 {% for item in data %}
-    ID: {{item.id}}<br>
-    Food Name: {{item.title}}<br>
-    <img src="../static/FoodImages/FoodImages/{{item.image}}"><br>
-    <form action="/delete-favourite/{{item.id}}">
-      <input type="submit" value="Delete favourite">
-    </form><br>
-  ---------------------------------------------------------------------------------------------------<br>
+ID: {{item.id}}<br>
+Food Name: {{item.title}}<br>
+<img src="../static/FoodImages/FoodImages/{{item.image}}"><br>
+<form action="/delete-favourite/{{item.id}}">
+    <input type="submit" value="Delete favourite">
+</form><br>
+---------------------------------------------------------------------------------------------------<br>
 {% endfor %}
 </p>
 {% endblock %}

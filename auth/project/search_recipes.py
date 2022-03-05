@@ -1,10 +1,11 @@
 import string
-
-import numpy as np
 import pandas as pd
+
+from spellchecker import SpellChecker
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import re
+
+spell = SpellChecker()  # the default is English (language='en')
 
 
 def get_and_clean():
@@ -60,6 +61,7 @@ def search_recipe_from_favourite(data_sec, favouriteInput):
     clean_input = clean_input.lower()
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+
     vectorizer = TfidfVectorizer(ngram_range=(1, 2))
     X = vectorizer.fit_transform(favouriteRecipe['title'])
     query_vec = vectorizer.transform([clean_input])
@@ -73,6 +75,21 @@ def search_recipe_from_favourite(data_sec, favouriteInput):
                 "image": favouriteRecipe.at[i, 'image']
             })
     return query
+
+
+# check correct spelling and suggest the possible spelling corrections
+def recommendedWord(word):
+    spell_correct = []
+    for w in word.split():
+        if w == spell.correction(w):
+            spell_correct.append(w)
+        else:
+            spell_correct.append(spell.correction(w))
+    spell_correct = ' '.join(spell_correct)
+    if word != spell_correct:
+        return spell_correct
+    else:
+        return word
 
 
 if __name__ == '__main__':
