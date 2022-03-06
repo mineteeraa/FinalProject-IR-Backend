@@ -22,7 +22,7 @@ def get_and_clean():
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
-    search_for_recipe_by_ingredients_TFIDF(readFile)
+    search_for_recipe_by_name_TFIDF(readFile)
 
 
 
@@ -33,6 +33,26 @@ def search_for_recipe_by_name_TFIDF(data_sec):
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
             str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
+            str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+    print("-------------------------------------------")
+    print("input ingredients: ")
+    ingredients = input()
+    clean_input = ingredients
+    clean_input = clean_input.lower()
+    clean_input = clean_input.translate(str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
+    clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    X = vectorizer.fit_transform(recipeName['Title'])
+    query_vec = vectorizer.transform([clean_input])
+    results = cosine_similarity(X, query_vec).reshape((-1,))
+    query = []
+    for i in results.argsort()[-10:][::-1]:
+        title = recipeName.iloc[i, 1]
+        query.append({"Food_name": title})
+    print(query)
+
+
 
 def search_for_recipe_by_ingredients_TFIDF(data_sec):
     ingredientsName = data_sec

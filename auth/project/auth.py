@@ -69,7 +69,7 @@ def add_favourite():
     db.session.add(new_favourite)
     db.session.commit()
     flash(1)
-    return render_template('search_ingredients_list.html')
+    return redirect(url_for('main.favourite'))
 
 
 @auth.route('/delete-favourite/<id>')
