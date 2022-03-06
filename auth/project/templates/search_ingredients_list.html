@@ -44,6 +44,10 @@
       <input name="food_image" value="{{item.Images}}" hidden>
       <input type="submit" value="Add to favourite">
     </form><br>
+    <form method="POST" action="/details">
+      <input name="food_name" value="{{item.Food_name}}" hidden>
+      <input type="submit" value="Details">
+    </form><br>
   ---------------------------------------------------------------------------------------------------<br>
   {% endfor %}
 </p>

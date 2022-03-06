@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+        Food Name: {{data.Name}}<br>
+        Instructions: {{data.Instructions}}<br>
+        Ingredients: {{data.Ingredients}}<br>
+        Image: <img src="../static/FoodImages/FoodImages/{{data.Image}}"><br>
+
+    {% for item in data2 %}
+    Food Name: {{item.Food_name}}<br>
+    <img src="../static/FoodImages/FoodImages/{{item.Images}}"><br>
+
+    <form method="POST" action="/add-favourite">
+      <input name="food_name" value="{{item.Food_name}}" hidden>
+      <input name="user" value="{{user_id}}" hidden>
+      <input name="food_image" value="{{item.Images}}" hidden>
+      <input type="submit" value="Add to favourite">
+    </form><br>
+    <form method="POST" action="/details">
+      <input name="food_name" value="{{item.Food_name}}" hidden>
+      <input type="submit" value="Details">
+    </form><br>
+  ---------------------------------------------------------------------------------------------------<br>
+  {% endfor %}
+{% endblock %}
