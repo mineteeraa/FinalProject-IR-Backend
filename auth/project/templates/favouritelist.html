@@ -35,6 +35,10 @@ Food Name: {{item.title}}<br>
 <form action="/delete-favourite/{{item.id}}">
     <input type="submit" value="Delete favourite">
 </form><br>
+ <form method="POST" action="/details">
+      <input name="food_name" value="{{item.title}}" hidden>
+      <input type="submit" value="Details">
+    </form><br>
 ---------------------------------------------------------------------------------------------------<br>
 {% endfor %}
 </p>
