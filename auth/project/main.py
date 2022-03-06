@@ -4,7 +4,7 @@ from . import data_sec
 from .models import Favourite
 from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
-from .search_recipes import search_for_recipe_by_ingredients_TFIDF, search_recipe_from_favourite, recommendedWord
+from .search_recipes import search_for_recipe_by_ingredients_TFIDF, search_recipe_from_favourite, recommendedWord , search_for_recipe_by_name_TFIDF
 
 main = Blueprint('main', __name__)
 
@@ -33,6 +33,13 @@ def ingredients():
 def favourite():
     favourite = Favourite.query.filter(Favourite.userid == current_user.id).all()
     return render_template('favouritelist.html', data=favourite, userid=current_user.id, recommendWord="")
+
+@main.route('/name', methods=['POST', 'GET'])
+@login_required
+def nameFood():
+    query = request.form.get('name')
+    data_ingredients = search_for_recipe_by_name_TFIDF(data_sec, query)
+    return render_template('search_ingredients_list.html', user_id=current_user.id, data=data_ingredients)
 
 
 @main.route('/searchFavourite', methods=['POST'])

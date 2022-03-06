@@ -54,6 +54,34 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec, ingredients):
         })
     return query
 
+def search_for_recipe_by_name_TFIDF(data_sec, name):
+    recipeName = data_sec
+    for i, row in recipeName.iterrows():
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].lower()
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
+        recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+
+    print("-------------------------------------------")
+    print("input ingredients: ")
+    # ingredients = input()
+    clean_input = name
+    clean_input = clean_input.lower()
+    clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
+    clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    X = vectorizer.fit_transform(recipeName['Title'])
+    query_vec = vectorizer.transform([clean_input])
+    results = cosine_similarity(X, query_vec).reshape((-1,))
+    query = []
+    for i in results.argsort()[-5:][::-1]:
+        query.append({
+            "Food_name": recipeName.at[i, 'Title'],
+            "Ingredients": recipeName.at[i, 'Cleaned_Ingredients'],
+            "Recipes": recipeName.at[i, 'Instructions'],
+            "Images": recipeName.at[i, 'Image_Name'] + ".jpg"
+        })
+    return query
 
 def search_recipe_from_favourite(data_sec, favouriteInput):
     favouriteRecipe = data_sec
