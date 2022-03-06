@@ -2,7 +2,7 @@ import pandas as pd
 
 from . import data_sec
 from .models import Favourite
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from .search_recipes import search_for_recipe_by_ingredients_TFIDF, search_recipe_from_favourite, recommendedWord , search_for_recipe_by_name_TFIDF
 
@@ -24,8 +24,18 @@ def profile():
 @login_required
 def ingredients():
     query = request.form.get('ingredients')
+    recommendWord = request.form.get("recommendWord")
+    if recommendWord != "":
+        query = recommendWord
+
     data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, query)
-    return render_template('search_ingredients_list.html', user_id=current_user.id, data=data_ingredients)
+    recommendWordReturn = ""
+    if query != recommendedWord(query):
+        recommendWordReturn = recommendedWord(query)
+    print(recommendWordReturn)
+
+    return render_template('search_ingredients_list.html', user_id=current_user.id, data=data_ingredients,
+                           recommendWord=recommendWordReturn, query=query)
 
 
 @main.route('/favourite')
@@ -38,8 +48,17 @@ def favourite():
 @login_required
 def nameFood():
     query = request.form.get('name')
-    data_ingredients = search_for_recipe_by_name_TFIDF(data_sec, query)
-    return render_template('search_ingredients_list.html', user_id=current_user.id, data=data_ingredients)
+    recommendWord = request.form.get("recommendWord")
+    if recommendWord != "":
+        query = recommendWord
+    data_name = search_for_recipe_by_name_TFIDF(data_sec, query)
+    # checking correct spelling word
+    recommendWordReturn = ""
+    if query != recommendedWord(query):
+        recommendWordReturn = recommendedWord(query)
+
+    return render_template('search_ingredients_list.html', user_id=current_user.id, data=data_name,
+                           recommendWord=recommendWordReturn)
 
 
 @main.route('/searchFavourite', methods=['POST'])

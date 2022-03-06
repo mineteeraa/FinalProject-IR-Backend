@@ -2,15 +2,38 @@
 
 {% block content %}
 
+<button type="submit">Name</button>
+<button type="submit">ingredients</button>
+
+
 <form method="POST" action="/ingredients">
   <label for="ingredients">Ingredients:</label>
   <input type="text" id="ingredients" name="ingredients"><br>
+  <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
   <input type="submit" value="Submit">
 </form>
 
+{% if recommendWord != "" %}
+<form method="POST" action="/ingredients">
+    <label>Searching result from</label>
+    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <button type="submit">{{recommendWord}}</button>
+</form>
+{% endif %}
+
+<!--Name-->
 <form method="POST" action="/name">
-  <label for="ingredients">Name:</label>
+  <label for="name">name:</label>
   <input type="text" id="name" name="name"><br>
+  <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
   <input type="submit" value="Submit">
 </form>
+
+{% if recommendWord != "" %}
+<form method="POST" action="/name">
+    <label>Searching result from</label>
+    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <button type="submit">{{recommendWord}}</button>
+</form>
+{% endif %}
 {% endblock %}

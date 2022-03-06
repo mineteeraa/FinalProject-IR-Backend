@@ -45,13 +45,12 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec, ingredients):
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
     query = []
-    for i in results.argsort()[-5:][::-1]:
-        query.append({
-            "Food_name": ingredientsName.at[i, 'Title'],
-            "Ingredients": ingredientsName.at[i, 'Cleaned_Ingredients'],
-            "Recipes": ingredientsName.at[i, 'Instructions'],
-            "Images": ingredientsName.at[i, 'Image_Name'] + ".jpg"
-        })
+    for i in results.argsort()[-10:][::-1]:
+        title = ingredientsName.iloc[i,1]
+        recipes = ingredientsName.iloc[i, 3]
+        images = ingredientsName.iloc[i, 4]
+        ingredients = ingredientsName.iloc[i, 5]
+        query.append({"Food_name": title , "Ingredients": ingredients,"Recipes": recipes,"Images":images + ".jpg"})
     return query
 
 def search_for_recipe_by_name_TFIDF(data_sec, name):
@@ -61,9 +60,6 @@ def search_for_recipe_by_name_TFIDF(data_sec, name):
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
-    print("-------------------------------------------")
-    print("input ingredients: ")
-    # ingredients = input()
     clean_input = name
     clean_input = clean_input.lower()
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
@@ -74,13 +70,12 @@ def search_for_recipe_by_name_TFIDF(data_sec, name):
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
     query = []
-    for i in results.argsort()[-5:][::-1]:
-        query.append({
-            "Food_name": recipeName.at[i, 'Title'],
-            "Ingredients": recipeName.at[i, 'Cleaned_Ingredients'],
-            "Recipes": recipeName.at[i, 'Instructions'],
-            "Images": recipeName.at[i, 'Image_Name'] + ".jpg"
-        })
+    for i in results.argsort()[-10:][::-1]:
+        title = recipeName.iloc[i,1]
+        recipes = recipeName.iloc[i, 3]
+        images = recipeName.iloc[i, 4]
+        ingredients = recipeName.iloc[i, 5]
+        query.append({"Food_name": title , "Ingredients": ingredients,"Recipes": recipes,"Images":images + ".jpg"})
     return query
 
 def search_recipe_from_favourite(data_sec, favouriteInput):
