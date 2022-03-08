@@ -1,4 +1,6 @@
 import string
+
+import numpy as np
 import pandas as pd
 
 from spellchecker import SpellChecker
@@ -11,12 +13,15 @@ spell = SpellChecker()  # the default is English (language='en')
 def get_and_clean():
     readFile = pd.read_csv('../resource/Food Ingredients and Recipe Dataset with Image Name Mapping.csv')
     readFile = pd.DataFrame(readFile)
-    readFile = readFile.dropna()
     readFile = readFile.drop_duplicates()
+    readFile = readFile.replace("", np.nan)
+    readFile = readFile.replace("#NAME?", np.nan)
+    readFile = readFile.dropna(how="any", axis="rows")
     for i, row in readFile.iterrows():
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].lower()
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
-            str.maketrans('', '', string.punctuation + u'\xa0'))
+            str.maketrans('', '', '[\',$\_&+:;=?@#|<>^*%\\!"-]' + u'\xa0'))
+
         readFile.at[i, 'Instructions'] = readFile.at[i, 'Instructions'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
@@ -28,7 +33,7 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec, ingredients):
     for i, row in ingredientsName.iterrows():
         ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].lower()
         ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(
-            str.maketrans('', '', string.punctuation + u'\xa0'))
+            str.maketrans('', '', '[$\_&+:;=?@#|<>.^*%\\!"-]' + u'\xa0'))
         ingredientsName.at[i, 'Cleaned_Ingredients'] = ingredientsName.at[i, 'Cleaned_Ingredients'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
@@ -37,7 +42,7 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec, ingredients):
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    vectorizer = TfidfVectorizer(ngram_range=(1, 3))
     X = vectorizer.fit_transform(ingredientsName['Cleaned_Ingredients'])
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
@@ -56,7 +61,7 @@ def search_for_recipe_by_name_TFIDF(data_sec, name):
     for i, row in recipeName.iterrows():
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].lower()
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
-            str.maketrans('', '', '([$\'_&+,:;=?@\[\]#|<>.^*()%\\!"-])' + u'\xa0'))
+            str.maketrans('', '', '[$\'_&+,:;=?@\[\]#|<>.^*%\\!"-]' + u'\xa0'))
         recipeName.at[i, 'Title'] = recipeName.at[i, 'Title'].translate(
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
@@ -65,7 +70,7 @@ def search_for_recipe_by_name_TFIDF(data_sec, name):
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    vectorizer = TfidfVectorizer(ngram_range=(1, 3))
     X = vectorizer.fit_transform(recipeName['Title'])
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
@@ -86,7 +91,7 @@ def search_recipe_from_favourite(data_sec, favouriteInput):
     clean_input = clean_input.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     clean_input = clean_input.translate(str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
-    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    vectorizer = TfidfVectorizer(ngram_range=(1, 3))
     X = vectorizer.fit_transform(favouriteRecipe['title'])
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))

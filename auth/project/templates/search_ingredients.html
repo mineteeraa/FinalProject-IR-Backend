@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="POST" action="/ingredients">
+    <label for="ingredients">Search by ingredients:</label>
+    <input type="text" id="ingredients" name="ingredients" class="input is-warning is-medium is-rounded"><br>
+    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <button type="submit" class="button is-warning">Search</button>
+</form>
+
+{% if recommendWord != "" %}
+<form method="POST" action="/ingredients">
+    <label>Searching result from</label>
+    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <button type="submit" class="button is-success">{{recommendWord}}</button>
+</form>
+{% endif %}
+
+<p class="title">
+    {% for item in data %}
+    Food Name: {{item.Food_name}}<br>
+    <img src="../static/FoodImages/FoodImages/{{item.Images}}"><br>
+
+<form method="POST" action="/add-favourite">
+    <input name="food_name" value="{{item.Food_name}}" hidden>
+    <input name="user" value="{{user_id}}" hidden>
+    <input name="food_image" value="{{item.Images}}" hidden>
+    <input type="submit" value="Add to favourite">
+</form><br>
+<form method="POST" action="/details">
+    <input name="food_name" value="{{item.Food_name}}" hidden>
+    <input type="submit" value="Details">
+</form><br></p>
+---------------------------------------------------------------------------------------------------<br>
+{% endfor %}
+
+<div class="buttons">
+    <a href="{{ url_for('main.ingredients') }}" class="button is-warning">
+        Prev
+    </a>
+    <a href="{{ url_for('main.ingredients') }}" class="button is-warning">
+        Next
+    </a>
+</div>
+{% endblock %}

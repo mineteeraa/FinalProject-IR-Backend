@@ -12,13 +12,10 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    return render_template('index.html')
-
-
-@main.route('/profile')
-@login_required
-def profile():
-    return render_template('profile.html', name=current_user.name)
+    if current_user.is_authenticated:
+        return render_template("index.html", name=current_user.name)
+    else:
+        return render_template("login.html")
 
 
 @main.route('/ingredients', methods=['POST'])
@@ -31,30 +28,13 @@ def ingredients():
     data_ingredients = ""
     if query != "":
         data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, query)
+    # checking correct spelling word
     recommendWordReturn = ""
     if query != recommendedWord(query):
         recommendWordReturn = recommendedWord(query)
-    # print(recommendWordReturn)
 
-    return render_template('search_ingredients_list.html', user_id=current_user.id, data=data_ingredients,
-                           recommendWord=recommendWordReturn, query=query)
-
-
-@main.route('/favourite')
-@login_required
-def favourite():
-    favourite = Favourite.query.filter(Favourite.userid == current_user.id).all()
-    return render_template('favouritelist.html', data=favourite, userid=current_user.id, recommendWord="")
-
-
-@main.route('/details', methods=['POST'])
-@login_required
-def details():
-    query = request.form.get('food_name')
-    data = getdetails(data_sec, query)
-    data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, data['Ingredients'])
-    data_ingredients = data_ingredients[1:5]
-    return render_template('details.html', data=data, data2= data_ingredients)
+    return render_template('search_ingredients.html', user_id=current_user.id, data=data_ingredients,
+                           recommendWord=recommendWordReturn, name=current_user.name)
 
 
 @main.route('/name', methods=['POST', 'GET'])
@@ -71,9 +51,26 @@ def nameFood():
     recommendWordReturn = ""
     if query != recommendedWord(query):
         recommendWordReturn = recommendedWord(query)
+    return render_template('search_nameFood.html', user_id=current_user.id, data=data_name,
+                           recommendWord=recommendWordReturn, name=current_user.name)
 
-    return render_template('search_ingredients_list.html', user_id=current_user.id, data=data_name,
-                           recommendWord=recommendWordReturn)
+
+@main.route('/favourite')
+@login_required
+def favourite():
+    favourite = Favourite.query.filter(Favourite.userid == current_user.id).all()
+    return render_template('favouritelist.html', data=favourite, userid=current_user.id, recommendWord="",
+                           name=current_user.name)
+
+
+@main.route('/details', methods=['POST'])
+@login_required
+def details():
+    query = request.form.get('food_name')
+    data = getdetails(data_sec, query)
+    data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, data['Ingredients'])
+    data_ingredients = data_ingredients[1:5]
+    return render_template('details.html', data=data, data2=data_ingredients, name=current_user.name)
 
 
 @main.route('/searchFavourite', methods=['POST'])
@@ -97,4 +94,4 @@ def search_favourite():
         recommendWordReturn = recommendedWord(search_fav)
 
     return render_template('favouritelist.html', data=data_favourite, userid=current_user.id,
-                           recommendWord=recommendWordReturn, searchFavourite=search_fav)
+                           recommendWord=recommendWordReturn, searchFavourite=search_fav, name=current_user.name)
