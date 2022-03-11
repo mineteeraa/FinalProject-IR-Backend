@@ -151,7 +151,7 @@ def recommendedNameWord(nameWord):
 
 
 def recommendedIngredientWord(ingredientWord):
-    sym_spell.create_dictionary('../static/resources/BagOfIngredients.txt', encoding='utf-8')
+    sym_spell.create_dictionary('../auth/project/static/resources/BagOfIngredients.txt', encoding='utf-8')
     sym_correct = sym_spell.word_segmentation(ingredientWord)
     return sym_correct.corrected_string
 

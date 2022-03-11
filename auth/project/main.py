@@ -35,7 +35,7 @@ def ingredients():
             recommendWordReturn = recommendedIngredientWord(query)
             # keep correct word that not effect to main query
             temp = recommendWordReturn
-            data_ingredients = search_for_recipe_by_name_TFIDF(data_sec, temp)
+            data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, temp)
         else:
             data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, query)
 
