@@ -1,24 +1,62 @@
 {% extends "base.html" %}
 {% block content %}
-        Food Name: {{data.Name}}<br>
-        Instructions: {{data.Instructions}}<br>
-        Ingredients: {{data.Ingredients}}<br>
-        Image: <img src="../static/FoodImages/FoodImages/{{data.Image}}"><br>
+<div class="columns is-mobile">
+    <div class="column is-2 is-offset-10">
+        <form method="POST" action="/add-favourite">
+            <input name="food_name" value="{{data.Name}}" hidden>
+            <input name="user" value="{{user_id}}" hidden>
+            <input name="food_image" value="{{data.Image}}" hidden>
+            <input type="submit" value="♥ Add to favourite"
+                   class="input is-danger is-small button-fav">
+        </form>
+    </div>
+</div>
+<img src="../static/FoodImages/FoodImages/{{data.Image}}"><br>
+<div class="title">{{data.Name}}</div>
+Ingredients: {{data.Ingredients}}<br>
+Instructions: {{data.Instructions}}<br>
+<br><br><br>
 
+<label class="subtitle"><b>Suggested recipes for you</b></label><br><br>
+<div class="columns is-multiline">
     {% for item in data2 %}
-    Food Name: {{item.Food_name}}<br>
-    <img src="../static/FoodImages/FoodImages/{{item.Images}}"><br>
+    <div class="column is-3 is-narrow">
+        <div class="box" style="width: auto">
+            <div class="card-image">
+                <figure class="image is-1by1">
+                    <img src="../static/FoodImages/FoodImages/{{item.Images}}">
+                </figure>
+            </div>
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content has-text-centered">
+                        <p class="subtitle">{{item.Food_name}}</p>
+                    </div>
+                </div>
+                <br>
+                <div class="content">
+                    <div class="columns">
+                        <div class="column">
+                            <form method="POST" action="/add-favourite">
+                                <input name="food_name" value="{{item.Food_name}}" hidden>
+                                <input name="user" value="{{user_id}}" hidden>
+                                <input name="food_image" value="{{item.Images}}" hidden>
+                                <input type="submit" value="♥ Add to favourite"
+                                       class="input is-danger is-small button-fav">
+                            </form>
+                        </div>
+                        <div class="column">
+                            <form method="POST" action="/details">
+                                <input name="food_name" value="{{item.Food_name}}" hidden>
+                                <input type="submit" value="🔍 Details" class="input is-small is-link button-detail">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
-    <form method="POST" action="/add-favourite">
-      <input name="food_name" value="{{item.Food_name}}" hidden>
-      <input name="user" value="{{user_id}}" hidden>
-      <input name="food_image" value="{{item.Images}}" hidden>
-      <input type="submit" value="Add to favourite">
-    </form><br>
-    <form method="POST" action="/details">
-      <input name="food_name" value="{{item.Food_name}}" hidden>
-      <input type="submit" value="Details">
-    </form><br>
-  ---------------------------------------------------------------------------------------------------<br>
-  {% endfor %}
 {% endblock %}

@@ -2,44 +2,92 @@
 
 {% block content %}
 <form method="POST" action="/name">
-    <label for="name">Search by name:</label>
-    <input type="text" id="name" name="name" class="input is-warning is-medium is-rounded"><br>
+    <label for="name" class="subtitle">Search by <b>"name"</b></label><br>
+    <input type="text" id="name" name="name" class="input is-warning is-medium is-rounded" value="{{query}}"><br><br>
     <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <input name="inputPage" value=0 hidden>
     <button type="submit" class="button is-warning">Search</button>
 </form>
-
+<br>
 {% if recommendWord != "" %}
 <form method="POST" action="/name">
-    <label>Searching result from</label>
+    <label>Did you mean</label>
     <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <input name="inputPage" value=0 hidden>
     <button type="submit" class="button is-success">{{recommendWord}}</button>
 </form>
 {% endif %}
 
-<p class="title">
+<div>
+    About {{result}} results
+</div>
+<br><br>
+
+<div class="columns is-multiline">
     {% for item in data %}
-    Food Name: {{item.Food_name}}<br>
-    <img src="../static/FoodImages/FoodImages/{{item.Images}}"><br>
+    <div class="column is-4 is-narrow">
+        <div class="box" style="width: auto">
+            <div class="card-image">
+                <figure class="image is-4by3">
+                    <img src="../static/FoodImages/FoodImages/{{item.Images}}">
+                </figure>
+            </div>
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content has-text-centered">
+                        <p class="title">{{item.Food_name}}</p>
+                    </div>
+                </div>
+                <br>
+                <div class="content">
+                    <div class="columns">
+                        <div class="column">
+                            <form method="POST" action="/add-favourite">
+                                <input name="food_name" value="{{item.Food_name}}" hidden>
+                                <input name="user" value="{{user_id}}" hidden>
+                                <input name="food_image" value="{{item.Images}}" hidden>
+                                <input type="submit" value="♥ Add to favourite"
+                                       class="input is-danger is-normal button-fav">
+                            </form>
+                        </div>
+                        <div class="column">
+                            <form method="POST" action="/details">
+                                <input name="food_name" value="{{item.Food_name}}" hidden>
+                                <input type="submit" value="🔍 Details" class="input is-normal is-link button-detail">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<br><br>
 
-<form method="POST" action="/add-favourite">
-    <input name="food_name" value="{{item.Food_name}}" hidden>
-    <input name="user" value="{{user_id}}" hidden>
-    <input name="food_image" value="{{item.Images}}" hidden>
-    <input type="submit" value="Add to favourite">
-</form><br>
-<form method="POST" action="/details">
-    <input name="food_name" value="{{item.Food_name}}" hidden>
-    <input type="submit" value="Details">
-</form><br></p>
----------------------------------------------------------------------------------------------------<br>
-{% endfor %}
+<div>
+    Page {{page+1}} of {{allPages}}
+</div>
+<br>
+<div class="buttons setCenter">
+    {% if hasOtherPage[0].prevPage %}
+    <div style="margin-right: 50px">
+        <form method="POST" action="/name">
+            <input type="text" name="name" value="{{query}}" hidden>
+            <input type="text" name="inputPage" value="{{page-1}}" hidden>
+            <input type="text" name="recommendWord" value="" hidden/>
+            <button type="submit" class="button is-info">Previous</button>
+        </form>
+    </div>
+    {% endif %}
 
-<div class="buttons">
-    <a href="{{ url_for('main.nameFood') }}" class="button is-warning">
-        Prev
-    </a>
-    <a href="{{ url_for('main.nameFood') }}" class="button is-warning">
-        Next
-    </a>
+    {% if hasOtherPage[0].nextPage %}
+    <form method="POST" action="/name">
+        <input type="text" name="name" value="{{query}}" hidden>
+        <input type="text" name="inputPage" value="{{page+1}}" hidden>
+        <input type="text" name="recommendWord" value="" hidden/>
+        <button type="submit" class="button is-info">Next</button>
+    </form>
+    {% endif %}
 </div>
 {% endblock %}

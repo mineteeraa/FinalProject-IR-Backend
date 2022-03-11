@@ -47,12 +47,14 @@ def search_for_recipe_by_ingredients_TFIDF(data_sec, ingredients):
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
     query = []
-    for i in results.argsort()[-10:][::-1]:
-        title = ingredientsName.iloc[i, 1]
-        recipes = ingredientsName.iloc[i, 3]
-        images = ingredientsName.iloc[i, 4]
-        ingredients = ingredientsName.iloc[i, 5]
-        query.append({"Food_name": title, "Ingredients": ingredients, "Recipes": recipes, "Images": images + ".jpg"})
+    for i in results.argsort()[::-1]:
+        if results[i] > 0:
+            title = ingredientsName.iloc[i, 1]
+            recipes = ingredientsName.iloc[i, 3]
+            images = ingredientsName.iloc[i, 4]
+            ingredients = ingredientsName.iloc[i, 5]
+            query.append(
+                {"Food_name": title, "Ingredients": ingredients, "Recipes": recipes, "Images": images + ".jpg"})
     return query
 
 
@@ -75,12 +77,14 @@ def search_for_recipe_by_name_TFIDF(data_sec, name):
     query_vec = vectorizer.transform([clean_input])
     results = cosine_similarity(X, query_vec).reshape((-1,))
     query = []
-    for i in results.argsort()[-10:][::-1]:
-        title = recipeName.iloc[i, 1]
-        recipes = recipeName.iloc[i, 3]
-        images = recipeName.iloc[i, 4]
-        ingredients = recipeName.iloc[i, 5]
-        query.append({"Food_name": title, "Ingredients": ingredients, "Recipes": recipes, "Images": images + ".jpg"})
+    for i in results.argsort()[::-1]:
+        if results[i] > 0:
+            title = recipeName.iloc[i, 1]
+            recipes = recipeName.iloc[i, 3]
+            images = recipeName.iloc[i, 4]
+            ingredients = recipeName.iloc[i, 5]
+            query.append(
+                {"Food_name": title, "Ingredients": ingredients, "Recipes": recipes, "Images": images + ".jpg"})
     return query
 
 
@@ -133,8 +137,44 @@ def getdetails(data_sec, foodname):
                          "Ingredients": data.at[j, 'Cleaned_Ingredients'],
                          "Image": data.at[j, 'Image_Name'] + ".jpg"})
 
-    # print(list[0]['Name'])
     return list[0]
+
+
+def currentPage(currentPage, allPages):
+    prev_page = True
+    next_page = True
+    if currentPage - 1 >= 0:
+        prev_page = True
+    else:
+        prev_page = False
+
+    if currentPage + 1 < allPages:
+        next_page = True
+    else:
+        next_page = False
+
+    return [{'prevPage': prev_page, 'nextPage': next_page}]
+
+
+def pagination(dataInput):
+    dataPerPage = 9
+    result = len(dataInput)
+    data = []
+    point = 0
+    if result / dataPerPage <= 1:
+        data.append(dataInput)
+        return data
+    else:
+        pageNumber = result // dataPerPage
+        for i in range(pageNumber + 1):
+            if point < result:
+                dataTemp = []
+                for j in range(dataPerPage):
+                    if point < result:
+                        dataTemp.append(dataInput[point])
+                        point = point + 1
+                data.append(dataTemp)
+        return data
 
 
 if __name__ == '__main__':

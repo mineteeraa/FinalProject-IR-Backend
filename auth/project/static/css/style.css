@@ -13,3 +13,25 @@ body {
 #recipeIngredients {
     display: none;
 }
+
+.setCenter {
+    justify-content: center !important;
+}
+
+.button-fav {
+    background-color: #feecf0 !important;
+    color: #f14668 !important;
+    justify-content: center !important;
+}
+
+.button-detail {
+    background-color: #eff1fa !important;
+    color: #485fc7 !important;
+    justify-content: center !important;
+}
+
+.button-delete {
+    background-color: #cc0f35 !important;
+    color: #ffffff !important;
+    justify-content: center !important;
+}

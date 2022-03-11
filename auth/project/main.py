@@ -5,7 +5,7 @@ from .models import Favourite
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from .search_recipes import search_for_recipe_by_ingredients_TFIDF, search_recipe_from_favourite, recommendedWord, \
-    search_for_recipe_by_name_TFIDF, getdetails
+    search_for_recipe_by_name_TFIDF, getdetails, pagination, currentPage
 
 main = Blueprint('main', __name__)
 
@@ -23,6 +23,7 @@ def index():
 def ingredients():
     query = request.form.get('ingredients')
     recommendWord = request.form.get("recommendWord")
+    page = int(request.form.get('inputPage'))
     if recommendWord != "":
         query = recommendWord
     data_ingredients = ""
@@ -33,8 +34,15 @@ def ingredients():
     if query != recommendedWord(query):
         recommendWordReturn = recommendedWord(query)
 
-    return render_template('search_ingredients.html', user_id=current_user.id, data=data_ingredients,
-                           recommendWord=recommendWordReturn, name=current_user.name)
+    result = len(data_ingredients)
+    data = pagination(data_ingredients)
+    allPages = len(data)
+    hasOtherPage = currentPage(page, allPages)
+    data = data[page]
+
+    return render_template('search_ingredients.html', user_id=current_user.id, data=data,
+                           recommendWord=recommendWordReturn, name=current_user.name, query=query,
+                           hasOtherPage=hasOtherPage, page=page, allPages=allPages, result=result)
 
 
 @main.route('/name', methods=['POST', 'GET'])
@@ -42,6 +50,7 @@ def ingredients():
 def nameFood():
     query = request.form.get('name')
     recommendWord = request.form.get("recommendWord")
+    page = int(request.form.get('inputPage'))
     if recommendWord != "":
         query = recommendWord
     data_name = ""
@@ -51,16 +60,25 @@ def nameFood():
     recommendWordReturn = ""
     if query != recommendedWord(query):
         recommendWordReturn = recommendedWord(query)
-    return render_template('search_nameFood.html', user_id=current_user.id, data=data_name,
-                           recommendWord=recommendWordReturn, name=current_user.name)
+
+    result = len(data_name)
+    data = pagination(data_name)
+    allPages = len(data)
+    hasOtherPage = currentPage(page, allPages)
+    data = data[page]
+
+    return render_template('search_nameFood.html', user_id=current_user.id, data=data,
+                           recommendWord=recommendWordReturn, name=current_user.name, query=query,
+                           hasOtherPage=hasOtherPage, page=page, allPages=allPages, result=result)
 
 
 @main.route('/favourite')
 @login_required
 def favourite():
     favourite = Favourite.query.filter(Favourite.userid == current_user.id).all()
+    totalFavourite = len(favourite)
     return render_template('favouritelist.html', data=favourite, userid=current_user.id, recommendWord="",
-                           name=current_user.name)
+                           name=current_user.name, result=None, totalFavourite=totalFavourite)
 
 
 @main.route('/details', methods=['POST'])
@@ -70,7 +88,8 @@ def details():
     data = getdetails(data_sec, query)
     data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, data['Ingredients'])
     data_ingredients = data_ingredients[1:5]
-    return render_template('details.html', data=data, data2=data_ingredients, name=current_user.name)
+    return render_template('details.html', data=data, data2=data_ingredients, name=current_user.name,
+                           user_id=current_user.id)
 
 
 @main.route('/searchFavourite', methods=['POST'])
@@ -93,5 +112,8 @@ def search_favourite():
     if search_fav != recommendedWord(search_fav):
         recommendWordReturn = recommendedWord(search_fav)
 
+    result = len(data_favourite)
+
     return render_template('favouritelist.html', data=data_favourite, userid=current_user.id,
-                           recommendWord=recommendWordReturn, searchFavourite=search_fav, name=current_user.name)
+                           recommendWord=recommendWordReturn, searchFavourite=search_fav, name=current_user.name,
+                           result=result, totalFavourite=0)

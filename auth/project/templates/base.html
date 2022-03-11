@@ -21,7 +21,7 @@
             <div class="container">
                 <div class="navbar-brand">
                     <a class="navbar-item" href="{{ url_for('main.index') }}">
-                        <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+                        <img src="https://www.designineducation.com/images/camt_horizontal.png">
                     </a>
                 </div>
                 <div class="navbar-menu">
@@ -80,42 +80,25 @@
 <script>
     function checkClickName() {
         var x = document.getElementById("recipeName");
+        var y = document.getElementById("recipeIngredients");
         if (x.style.display === "none") {
             x.style.display = "block";
+            y.style.display = "none";
         } else {
             x.style.display = "none";
+            y.style.display = "block";
         }
     }
 
     function checkClickIngredients() {
         var x = document.getElementById("recipeIngredients");
+        var y = document.getElementById("recipeName");
         if (x.style.display === "none") {
             x.style.display = "block";
+            y.style.display = "none";
         } else {
             x.style.display = "none";
+            y.style.display = "block";
         }
     }
-
-
-    // function checkClick() {
-    //     var recipeName = document.getElementById("recipeName");
-    //     var recipeIngredients = document.getElementById("recipeIngredients");
-    //     if (recipeName.style.display === "block") {
-    //         recipeName.style.display = "none";
-    //         recipeIngredients.style.display = "block";
-    //     }
-    //     if (recipeName.style.display === "none") {
-    //         recipeName.style.display = "block";
-    //         recipeIngredients.style.display = "none";
-    //     }
-    //     if (recipeIngredients.style.display === "block") {
-    //         recipeName.style.display = "block";
-    //         recipeIngredients.style.display = "none";
-    //     }
-    //     if (recipeIngredients.style.display === "none") {
-    //         recipeName.style.display = "none";
-    //         recipeIngredients.style.display = "block";
-    //     }
-    // }
-
 </script>

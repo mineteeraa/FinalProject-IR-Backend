@@ -7,20 +7,22 @@
 
 <button type="submit" onclick="checkClickName()" class="button is-warning">Search by Name</button>
 <button type="submit" onclick="checkClickIngredients()" class="button is-warning">Search by Ingredients</button>
-
+<br><br>
 <!--Name-->
 <form method="POST" action="/name" id="recipeName">
-    <label for="name">Search by name:</label>
-    <input type="text" id="name" name="name" class="input is-warning is-medium is-rounded"><br>
+    <label for="name" class="subtitle">Search by <b>"name"</b></label><br>
+    <input type="text" id="name" name="name" class="input is-warning is-medium is-rounded"><br><br>
     <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <input name="inputPage" value=0 hidden>
     <button type="submit" class="button is-warning">Search</button>
 </form>
 
 <!--Ingredients-->
 <form method="POST" action="/ingredients" id="recipeIngredients">
-    <label for="ingredients">Search by ingredients:</label>
-    <input type="text" id="ingredients" name="ingredients" class="input is-warning is-medium is-rounded"><br>
+    <label for="ingredients" class="subtitle">Search by <b>"ingredients"</b></label><br>
+    <input type="text" id="ingredients" name="ingredients" class="input is-warning is-medium is-rounded"><br><br>
     <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <input name="inputPage" value=0 hidden>
     <button type="submit" class="button is-warning">Search</button>
 </form>
 {% endblock %}
