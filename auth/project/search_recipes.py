@@ -1,13 +1,12 @@
 import string
-
 import numpy as np
 import pandas as pd
 
-from spellchecker import SpellChecker
+from symspellpy import SymSpell
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-spell = SpellChecker()  # the default is English (language='en')
+sym_spell = SymSpell()
 
 
 def get_and_clean():
@@ -26,6 +25,40 @@ def get_and_clean():
             str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
 
     return readFile
+
+
+def bagOfNameWords():
+    data_sec = get_and_clean()
+    for i, row in data_sec.iterrows():
+        data_sec.at[i, 'Title'] = data_sec.at[i, 'Title'].lower()
+        data_sec.at[i, 'Title'] = data_sec.at[i, 'Title'].translate(
+            str.maketrans('', '', '[$\'_&+,:;=?@\[\]#|<>.^*%\\!"-]' + u'\xa0'))
+        data_sec.at[i, 'Title'] = data_sec.at[i, 'Title'].translate(
+            str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    X = vectorizer.fit_transform(data_sec['Title'])
+    listToString = ' '.join([str(element) for element in vectorizer.get_feature_names()])  # fetch words
+    file = open('../static/resources/bagOfName.txt', 'w', encoding='utf-8')
+    file.write(listToString)
+    file.close()
+
+
+def bagOfIngredientWords():
+    data_sec = get_and_clean()
+    for i, row in data_sec.iterrows():
+        data_sec.at[i, 'Cleaned_Ingredients'] = data_sec.at[i, 'Cleaned_Ingredients'].lower()
+        data_sec.at[i, 'Cleaned_Ingredients'] = data_sec.at[i, 'Cleaned_Ingredients'].translate(
+            str.maketrans('', '', '[$\_&+:;=?@#|<>.^*%\\!"-]' + u'\xa0'))
+        data_sec.at[i, 'Cleaned_Ingredients'] = data_sec.at[i, 'Cleaned_Ingredients'].translate(
+            str.maketrans(string.whitespace, ' ' * len(string.whitespace), ''))
+
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    X = vectorizer.fit_transform(data_sec['Cleaned_Ingredients'])
+    listToString = ' '.join([str(element) for element in vectorizer.get_feature_names()])  # fetch words
+    file = open('../static/resources/bagOfIngredients.txt', 'w', encoding='utf-8')
+    file.write(listToString)
+    file.close()
 
 
 def search_for_recipe_by_ingredients_TFIDF(data_sec, ingredients):
@@ -111,18 +144,16 @@ def search_recipe_from_favourite(data_sec, favouriteInput):
 
 
 # check correct spelling and suggest the possible spelling corrections
-def recommendedWord(word):
-    spell_correct = []
-    for w in word.split():
-        if w == spell.correction(w):
-            spell_correct.append(w)
-        else:
-            spell_correct.append(spell.correction(w))
-    spell_correct = ' '.join(spell_correct)
-    if word != spell_correct:
-        return spell_correct
-    else:
-        return word
+def recommendedNameWord(nameWord):
+    sym_spell.create_dictionary('../auth/project/static/resources/bagOfName.txt', encoding='utf-8')
+    sym_correct = sym_spell.word_segmentation(nameWord)
+    return sym_correct.corrected_string
+
+
+def recommendedIngredientWord(ingredientWord):
+    sym_spell.create_dictionary('../static/resources/BagOfIngredients.txt', encoding='utf-8')
+    sym_correct = sym_spell.word_segmentation(ingredientWord)
+    return sym_correct.corrected_string
 
 
 def getdetails(data_sec, foodname):
@@ -179,3 +210,5 @@ def pagination(dataInput):
 
 if __name__ == '__main__':
     get_and_clean()
+    bagOfNameWords()
+    bagOfIngredientWords()

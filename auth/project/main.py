@@ -4,8 +4,8 @@ from . import data_sec
 from .models import Favourite
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
-from .search_recipes import search_for_recipe_by_ingredients_TFIDF, search_recipe_from_favourite, recommendedWord, \
-    search_for_recipe_by_name_TFIDF, getdetails, pagination, currentPage
+from .search_recipes import search_for_recipe_by_ingredients_TFIDF, search_recipe_from_favourite, recommendedNameWord, \
+    recommendedIngredientWord, search_for_recipe_by_name_TFIDF, getdetails, pagination, currentPage
 
 main = Blueprint('main', __name__)
 
@@ -26,13 +26,18 @@ def ingredients():
     page = int(request.form.get('inputPage'))
     if recommendWord != "":
         query = recommendWord
+
     data_ingredients = ""
-    if query != "":
-        data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, query)
-    # checking correct spelling word
     recommendWordReturn = ""
-    if query != recommendedWord(query):
-        recommendWordReturn = recommendedWord(query)
+    if query != "":
+        # checking correct spelling word
+        if query != recommendedIngredientWord(query):
+            recommendWordReturn = recommendedIngredientWord(query)
+            # keep correct word that not effect to main query
+            temp = recommendWordReturn
+            data_ingredients = search_for_recipe_by_name_TFIDF(data_sec, temp)
+        else:
+            data_ingredients = search_for_recipe_by_ingredients_TFIDF(data_sec, query)
 
     result = len(data_ingredients)
     data = pagination(data_ingredients)
@@ -53,13 +58,18 @@ def nameFood():
     page = int(request.form.get('inputPage'))
     if recommendWord != "":
         query = recommendWord
+
     data_name = ""
-    if query != "":
-        data_name = search_for_recipe_by_name_TFIDF(data_sec, query)
-    # checking correct spelling word
     recommendWordReturn = ""
-    if query != recommendedWord(query):
-        recommendWordReturn = recommendedWord(query)
+    if query != "":
+        # checking correct spelling word
+        if query != recommendedNameWord(query):
+            recommendWordReturn = recommendedNameWord(query)
+            # keep correct word that not effect to main query
+            temp = recommendWordReturn
+            data_name = search_for_recipe_by_name_TFIDF(data_sec, temp)
+        else:
+            data_name = search_for_recipe_by_name_TFIDF(data_sec, query)
 
     result = len(data_name)
     data = pagination(data_name)
@@ -105,12 +115,18 @@ def search_favourite():
     for fav in favourite:
         favourite_list.append([fav.id, fav.title, fav.image])
     df = pd.DataFrame(favourite_list, columns=['id', 'title', 'image'])
-    data_favourite = search_recipe_from_favourite(df, search_fav)
 
-    # checking correct spelling word
+    data_favourite = ""
     recommendWordReturn = ""
-    if search_fav != recommendedWord(search_fav):
-        recommendWordReturn = recommendedWord(search_fav)
+    if search_fav != "":
+        # checking correct spelling word
+        if search_fav != recommendedNameWord(search_fav):
+            recommendWordReturn = recommendedNameWord(search_fav)
+            # keep correct word that not effect to main query
+            temp = recommendWordReturn
+            data_favourite = search_recipe_from_favourite(df, temp)
+        else:
+            data_favourite = search_recipe_from_favourite(df, search_fav)
 
     result = len(data_favourite)
 
