@@ -1,20 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="columns is-mobile">
-    <div class="column is-2 is-offset-10">
-        <form method="POST" action="/add-favourite">
-            <input name="food_name" value="{{data.Name}}" hidden>
-            <input name="user" value="{{user_id}}" hidden>
-            <input name="food_image" value="{{data.Image}}" hidden>
-            <input type="submit" value="♥ Add to favourite"
-                   class="input is-danger is-small button-fav">
-        </form>
+
+<div class="box">
+    <div class="columns is-mobile">
+        <div class="column is-2 is-offset-10">
+            <form method="POST" action="/add-favourite">
+                <input name="food_name" value="{{data.Name}}" hidden>
+                <input name="user" value="{{user_id}}" hidden>
+                <input name="food_image" value="{{data.Image}}" hidden>
+                <input type="submit" value="♥ Add to favourite"
+                       class="input is-danger is-small button-fav">
+            </form>
+        </div>
+    </div>
+    <img src="../static/FoodImages/FoodImages/{{data.Image}}"><br>
+    <div class="title">{{data.Name}}</div><br>
+    <div class="columns has-text-left">
+        <div class="column is-6 card">
+            <div class="has-text-weight-bold">Ingredients</div><br>
+            {% set ingredient_list = data.Ingredients.split("', '") %}
+            {% for ingredient in ingredient_list %}
+            <p>• {{ ingredient | replace("'", "") }}</p><br>
+            {% endfor %}
+        </div>
+        <div class="column is-6 card">
+            <div class="has-text-weight-bold">Instructions</div><br>
+            {% set instruction_list = data.Instructions.split(". ") %}
+            {% for instruction in instruction_list %}
+            <p>• {{ instruction }}</p><br>
+            {% endfor %}
+        </div>
     </div>
 </div>
-<img src="../static/FoodImages/FoodImages/{{data.Image}}"><br>
-<div class="title">{{data.Name}}</div>
-Ingredients: {{data.Ingredients}}<br>
-Instructions: {{data.Instructions}}<br>
 <br><br><br>
 
 <label class="subtitle"><b>Suggested recipes for you</b></label><br><br>
