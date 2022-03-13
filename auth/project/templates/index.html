@@ -1,39 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
+<p class="title">
+    Let's find your recipe
+</p>
 
-<button type="submit">Name</button>
-<button type="submit">ingredients</button>
-
-
-<form method="POST" action="/ingredients">
-  <label for="ingredients">Ingredients:</label>
-  <input type="text" id="ingredients" name="ingredients"><br>
-  <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
-  <input type="submit" value="Submit">
-</form>
-
-{% if recommendWord != "" %}
-<form method="POST" action="/ingredients">
-    <label>Searching result from</label>
-    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
-    <button type="submit">{{recommendWord}}</button>
-</form>
-{% endif %}
-
+<button type="submit" onclick="checkClickName()" class="button is-warning">Search by Name</button>
+<button type="submit" onclick="checkClickIngredients()" class="button is-warning">Search by Ingredients</button>
+<br><br>
 <!--Name-->
-<form method="POST" action="/name">
-  <label for="name">name:</label>
-  <input type="text" id="name" name="name"><br>
-  <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
-  <input type="submit" value="Submit">
+<form method="POST" action="/name" id="recipeName">
+    <label for="name" class="subtitle">Search by <b>"name"</b></label><br>
+    <input type="text" id="name" name="name" class="input is-warning is-medium is-rounded"><br><br>
+    <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
+    <input name="inputPage" value=0 hidden>
+    <button type="submit" class="button is-warning">Search</button>
 </form>
 
-{% if recommendWord != "" %}
-<form method="POST" action="/name">
-    <label>Searching result from</label>
+<!--Ingredients-->
+<form method="POST" action="/ingredients" id="recipeIngredients">
+    <label for="ingredients" class="subtitle">Search by <b>"ingredients"</b></label><br>
+    <input type="text" id="ingredients" name="ingredients" class="input is-warning is-medium is-rounded"><br><br>
     <input type="text" name="recommendWord" value="{{recommendWord}}" hidden/>
-    <button type="submit">{{recommendWord}}</button>
+    <input name="inputPage" value=0 hidden>
+    <button type="submit" class="button is-warning">Search</button>
 </form>
-{% endif %}
 {% endblock %}
